@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلة المشتريات | ELBNA STORE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #050505; color: white; min-height: 100vh; display: flex; flex-direction: column; }
+        .cart-card { background: #0a0a0a; border: 1px solid #1a1a1a; }
+        .btn-yellow { background: linear-gradient(90deg, #eab308, #ca8a04); color: black; }
+    </style>
+</head>
+<body>
+
+    <nav class="p-6 border-b border-white/5 flex justify-between items-center bg-black">
+        <a href="index.html" class="text-2xl font-black text-yellow-500 italic">ELBNA<span class="text-white">STORE</span></a>
+        <a href="index.html" class="text-sm font-bold text-gray-400 hover:text-white transition">العودة للمتجر ←</a>
+    </nav>
+
+    <div class="container mx-auto py-12 px-6 flex-grow">
+        <h1 class="text-4xl font-black mb-10 italic">سلة <span class="text-yellow-500">المشتريات</span></h1>
+        
+        <div id="cartContent" class="hidden">
+            <div class="cart-card rounded-[2.5rem] p-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8 border-b border-white/5 pb-8">
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <div class="h-40 w-40 bg-black rounded-3xl p-4 flex items-center justify-center border border-white/5">
+                            <img id="cartImg" src="" class="h-full object-contain" onerror="this.src='https://placehold.co/150x150/111/eab308?text=ELBNA+STORE'">
+                        </div>
+                        <div class="text-center md:text-right">
+                            <h3 id="cartName" class="text-2xl font-black text-white mb-2 uppercase"></h3>
+                            <p class="text-yellow-500 font-bold">الكمية: 1</p>
+                        </div>
+                    </div>
+                    <div class="text-4xl font-black"><span id="cartPrice">0</span> ج.م</div>
+                </div>
+
+                <div class="mt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="text-2xl font-bold text-gray-500">
+                        إجمالي المبلغ: <span id="totalPrice" class="text-white text-4xl font-black">0</span> ج.م
+                    </div>
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button onclick="clearCart()" class="text-red-500 font-bold px-4 hover:underline">حذف المنتج</button>
+                        <a href="checkout.html" class="btn-yellow px-12 py-4 rounded-2xl font-black text-xl hover:scale-105 transition shadow-lg text-center flex-grow">استكمال الطلب 🚀</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="emptyMsg" class="text-center py-24">
+            <div class="text-8xl mb-6 opacity-20">🛒</div>
+            <h2 class="text-2xl font-black text-gray-500 mb-8 uppercase">سلتك فارغة!</h2>
+            <a href="index.html" class="bg-white text-black px-10 py-4 rounded-2xl font-black hover:bg-yellow-500 transition shadow-xl">تصفح المنتجات الآن</a>
+        </div>
+    </div>
+
+    <footer class="py-6 text-center text-[10px] text-gray-700 tracking-[3px] uppercase border-t border-white/5">
+        © 2026 ELBNA STORE
+    </footer>
+
+    <script>
+        window.onload = function() {
+            const name  = localStorage.getItem('selectedProduct');
+            const price = localStorage.getItem('selectedPrice');
+            const img   = localStorage.getItem('selectedImg');
+
+            if (name && price) {
+                document.getElementById('cartContent').classList.remove('hidden');
+                document.getElementById('emptyMsg').classList.add('hidden');
+                document.getElementById('cartName').innerText  = name;
+                document.getElementById('cartPrice').innerText = price;
+                document.getElementById('totalPrice').innerText = price;
+                document.getElementById('cartImg').src = img || '';
+            }
+        };
+
+        function clearCart() {
+            localStorage.removeItem('selectedProduct');
+            localStorage.removeItem('selectedPrice');
+            localStorage.removeItem('selectedImg');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

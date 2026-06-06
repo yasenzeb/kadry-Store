@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل المنتج | OMAR STORE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #050505; color: white; }
+        .watermark { position: fixed; bottom: 10px; left: 10px; font-size: 10px; color: rgba(255, 255, 255, 0.1); font-family: sans-serif !important; pointer-events: none; z-index: 99; }
+    </style>
+</head>
+<body>
+
+    <div class="watermark">Dev: Yassin ElSeba3e</div>
+
+    <nav class="p-6 border-b border-white/5">
+        <a href="index.html" class="text-yellow-500 font-black text-2xl">OMAR STORE</a>
+    </nav>
+
+    <div class="container mx-auto py-20 px-6">
+        <div class="flex flex-col md:flex-row gap-12 bg-[#0a0a0a] p-10 rounded-[40px] border border-white/5">
+            <div class="md:w-1/2 bg-black p-10 rounded-3xl flex items-center justify-center">
+                <img id="mainImg" src="" class="w-full h-80 object-contain" onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/eab308?text=OMAR+STORE'">
+            </div>
+            <div class="md:w-1/2 flex flex-col justify-center">
+                <h1 id="prodName" class="text-5xl font-black mb-6 text-yellow-500">جاري التحميل...</h1>
+                <p class="text-gray-400 text-lg mb-8">هذا المنتج أصلي ومضمون 100% من متجر عمر ستور ومسجل رسمياً لدى هيئة سلامة الغذاء.</p>
+                <div class="text-4xl font-black mb-10"><span id="prodPrice">0</span> ج.م</div>
+                <a href="checkout.html" class="block text-center bg-white text-black py-5 rounded-2xl font-black text-xl hover:bg-yellow-500 transition shadow-xl">إتمام عملية الشراء 🚀</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const name = localStorage.getItem('selectedProduct');
+            const price = localStorage.getItem('selectedPrice');
+            const img = localStorage.getItem('selectedImg');
+
+            if (name && price) {
+                document.getElementById('prodName').innerText = name;
+                document.getElementById('prodPrice').innerText = price;
+                if(img) {
+                    document.getElementById('mainImg').src = img;
+                }
+            } else {
+                // إذا لم يتم العثور على بيانات يرجع للرئيسية
+                window.location.href = 'index.html';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELBNA STORE | إلبنا ستور</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body, h1, h2, h3, p, a, button, span { font-family: 'Cairo', sans-serif !important; }
+        body { scroll-behavior: smooth; background-color: #0f0f0f; color: white; overflow-x: hidden; }
+        .fas, .fab, .far, i { font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important; font-style: normal !important; }
+
+        .glass-nav { background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        #mobile-menu { display: none; flex-direction: column; background: rgba(0,0,0,0.97); position: fixed; top: 64px; right: 0; left: 0; z-index: 49; padding: 16px 24px; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        #mobile-menu.open { display: flex; }
+        #mobile-menu a { font-size: 1rem; font-weight: 700; color: #d1d5db; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-decoration: none; transition: color .2s; }
+        #mobile-menu a:hover, #mobile-menu a.active { color: #eab308; }
+        .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; }
+        .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 2px; transition: all .3s; }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .hero-text { text-shadow: 0 0 20px rgba(234,179,8,0.5); }
+        .hero-bg { position: relative; height: 100vh; min-height: 500px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #000; }
+        .hero-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.8s ease-in-out; z-index: 1; }
+        .hero-slide.active { opacity: 1; }
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2; }
+        .hero-content { z-index: 10; position: relative; text-align: center; padding: 0 20px; }
+
+        .product-card, .review-card { background: #1a1a1a; transition: 0.5s; border: 1px solid #222; overflow: hidden; position: relative; }
+        .product-card:hover { transform: translateY(-10px); border-color: #eab308; }
+
+        .gradient-btn { background: linear-gradient(90deg,#eab308 0%,#ca8a04 100%); color: black; }
+        .tab-btn.active { background-color: #eab308; color: black; border-color: #eab308; }
+
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 6px; }
+        .dot-online { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .old-price { text-decoration: line-through; color: #ef4444; font-size: 0.85rem; opacity: 0.7; }
+        .discount-badge { background: linear-gradient(135deg,#ef4444,#dc2626); color: #fff; font-size: .7rem; font-weight: 900; padding: 3px 8px; border-radius: 8px; }
+
+        .whatsapp-float { position: fixed; bottom: 24px; left: 24px; background-color: #25d366; color: #FFF; border-radius: 50px; text-align: center; font-size: 28px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); z-index: 100; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: 0.3s; }
+        .whatsapp-float:hover { transform: scale(1.1); }
+
+        #product-list { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+        @media(min-width:640px){ #product-list{grid-template-columns:repeat(2,1fr);gap:16px;} }
+        @media(min-width:768px){ #product-list{grid-template-columns:repeat(3,1fr);gap:20px;} }
+        @media(min-width:1024px){ #product-list{grid-template-columns:repeat(4,1fr);gap:24px;} }
+
+        @media(max-width:639px){
+            .product-card{border-radius:18px!important;}
+            .product-card .prod-img-wrap{height:160px!important;}
+            .product-card h3{font-size:.9rem!important;margin-bottom:8px!important;}
+            .product-card .old-price{font-size:.7rem!important;}
+            .product-card .price-big{font-size:1.3rem!important;}
+            .product-card .order-btn{padding:10px!important;font-size:.8rem!important;}
+            .product-card .card-body{padding:10px!important;}
+            .tab-btn{padding:6px 12px!important;font-size:.75rem!important;}
+        }
+        @media(max-width:639px){
+            .hero-bg{height:92vh;min-height:480px;}
+            .hero-title{font-size:2.8rem!important;}
+            .hero-sub{font-size:1rem!important;margin-bottom:28px!important;}
+            .hero-cta{padding:14px 32px!important;font-size:.95rem!important;}
+        }
+
+        .tabs-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
+        .tabs-scroll::-webkit-scrollbar { display: none; }
+        .tabs-inner { display: flex; gap: 10px; white-space: nowrap; min-width: max-content; }
+
+        .review-card { border-radius: 1.5rem; }
+        .stars { color: #eab308; }
+    </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="glass-nav fixed w-full z-50 py-4 px-5">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="text-2xl md:text-3xl font-black text-yellow-500 italic tracking-tighter">
+            ELBNA <span class="text-white">STORE</span>
+        </div>
+        <div class="hidden md:flex gap-8 font-bold text-sm">
+            <a href="index.html" class="text-yellow-500">الرئيسية</a>
+            <a href="#about" class="hover:text-yellow-500 transition">لماذا نحن؟</a>
+            <a href="#products" class="hover:text-yellow-500 transition">المنتجات</a>
+            <a href="#reviews" class="hover:text-yellow-500 transition">آراء العملاء</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="cart.html" class="text-xl">🛒</a>
+            <div class="md:hidden hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="mobile-menu">
+    <a href="index.html" class="active" onclick="closeMenu()">الرئيسية</a>
+    <a href="#about" onclick="closeMenu()">لماذا نحن؟</a>
+    <a href="#products" onclick="closeMenu()">المنتجات</a>
+    <a href="#reviews" onclick="closeMenu()">آراء العملاء</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="hero" class="hero-bg px-4">
+    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1585386959984-a4155224a1ad?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content" data-aos="zoom-in">
+        <h1 class="hero-title text-5xl md:text-7xl lg:text-8xl font-black hero-text mb-4 md:mb-6 uppercase italic leading-none">
+            اشتري <span class="text-yellow-500">الأفضل</span>
+        </h1>
+        <p class="hero-sub text-lg md:text-2xl text-gray-300 mb-8 md:mb-10 font-bold italic px-4">
+            ساعات ذكية · سماعات · إكسسوارات إلكترونية | ضمان 3 شهور 🛡️
+        </p>
+        <a href="#products" class="hero-cta gradient-btn font-black px-8 md:px-12 py-3 md:py-4 rounded-full inline-block shadow-lg hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] transition text-sm md:text-base">
+            تسوق العروض الآن
+        </a>
+    </div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section id="about" class="bg-[#0a0a0a] py-16 md:py-20 px-5 border-y border-white/5">
+    <div class="container mx-auto about-grid grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 text-center">
+        <div data-aos="fade-up">
+            <i class="fas fa-certificate text-3xl md:text-4xl text-yellow-500 mb-4"></i>
+            <h3 class="text-lg md:text-xl font-black mb-2">منتجات أصلية</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">ساعات ذكية وسماعات وإكسسوارات إلكترونية أصلية 100% مع ضمان 3 شهور على كل المنتجات.</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="100">
+            <i class="fas fa-bolt text-3xl md:text-4xl text-yellow-500 mb-4"></i>
+            <h3 class="text-lg md:text-xl font-black mb-2">أسرع شحن في مصر</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">نحن ندرك قيمة وقتك؛ لذا نوفر أسرع خدمة توصيل لكل المحافظات وبأرخص سعر.</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="200">
+            <i class="fas fa-hand-holding-usd text-3xl md:text-4xl text-yellow-500 mb-4"></i>
+            <h3 class="text-lg md:text-xl font-black mb-2">أرخص الأسعار</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">نحطم الأسعار لنقدم لك منتجات إلكترونية أصلية بأقل تكلفة ممكنة في السوق المصري.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ══ PRODUCTS ══ -->
+<section id="products" class="container mx-auto py-16 md:py-24 px-4 md:px-6">
+    <div class="flex flex-col gap-5 mb-10 md:mb-16" data-aos="fade-left">
+        <div class="flex items-center gap-4">
+            <div class="h-8 md:h-10 w-1.5 md:w-2 bg-yellow-500"></div>
+            <h2 class="text-2xl md:text-4xl font-black uppercase italic tracking-tighter">أقوى العروض</h2>
+        </div>
+        <div class="tabs-scroll">
+            <div class="tabs-inner" id="filter-tabs-container">
+                <button onclick="filterProducts('all',event)" class="tab-btn active border border-white/10 px-5 py-2 rounded-xl font-bold text-sm transition">الكل</button>
+            </div>
+        </div>
+    </div>
+    <div id="product-list"></div>
+</section>
+
+<!-- ══ REVIEWS ══ -->
+<section id="reviews" class="bg-[#0a0a0a] py-16 md:py-24 px-4 md:px-6">
+    <div class="container mx-auto">
+        <div class="flex items-center gap-4 mb-10 md:mb-16" data-aos="fade-left">
+            <div class="h-8 md:h-10 w-1.5 md:w-2 bg-yellow-500"></div>
+            <h2 class="text-2xl md:text-4xl font-black uppercase italic tracking-tighter">آراء العملاء</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8" id="reviews-container">
+            <div class="review-card p-6 md:p-8" data-aos="fade-up">
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="w-11 h-11 bg-yellow-500 rounded-full flex items-center justify-center text-black font-black text-lg">م</div>
+                    <div><h4 class="font-bold">محمد أحمد</h4><p class="stars text-xs">★★★★★</p></div>
+                </div>
+                <p class="text-gray-400 italic text-sm leading-relaxed">"الساعة الذكية وصلتني بسرعة وجودتها خيالية، سعر ممتاز ومش بيتلاقيش في أي مكان تاني!"</p>
+            </div>
+            <div class="review-card p-6 md:p-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="w-11 h-11 bg-yellow-500 rounded-full flex items-center justify-center text-black font-black text-lg">س</div>
+                    <div><h4 class="font-bold">سارة علي</h4><p class="stars text-xs">★★★★★</p></div>
+                </div>
+                <p class="text-gray-400 italic text-sm leading-relaxed">"اشتريت سماعة بلوتوث وجودة الصوت عالية جداً، التغليف محترم والتوصيل كان سريع."</p>
+            </div>
+            <div class="review-card p-6 md:p-8" data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="w-11 h-11 bg-yellow-500 rounded-full flex items-center justify-center text-black font-black text-lg">ع</div>
+                    <div><h4 class="font-bold">عمر حسن</h4><p class="stars text-xs">★★★★★</p></div>
+                </div>
+                <p class="text-gray-400 italic text-sm leading-relaxed">"أحسن متجر إلكتروني جربته، الضمان 3 شهور ده ميزة كبيرة وخدمة العملاء ممتازة."</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="bg-black py-10 md:py-12 px-6 border-t border-white/5 text-center">
+    <div class="flex justify-center gap-8 mb-6 text-2xl">
+        <a href="https://www.tiktok.com/@elbanastore0" target="_blank" class="text-gray-500 hover:text-white transition"><i class="fab fa-tiktok"></i></a>
+        <a href="https://wa.me/201006544789" target="_blank" class="text-gray-500 hover:text-white transition"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <p class="text-yellow-500 text-xs font-bold mb-2 uppercase tracking-widest italic">© 2026 ELBNA STORE | جميع الحقوق محفوظة</p>
+</footer>
+
+<a href="https://wa.me/201006544789" target="_blank" class="whatsapp-float">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 1000, once: true });
+
+const slides = document.querySelectorAll('.hero-slide');
+let currentSlide = 0;
+setInterval(() => {
+    slides[currentSlide].classList.remove('active');
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add('active');
+}, 3000);
+
+function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+}
+function closeMenu() {
+    document.getElementById('mobile-menu').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+}
+
+const container = document.getElementById('product-list');
+let allProducts = [];
+let allCategories = [];
+
+async function loadCategories() {
+    try {
+        const res  = await fetch('/api/categories');
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+        allCategories = json.categories || [];
+    } catch (err) {
+        allCategories = [];
+    }
+    renderFilterTabs();
+}
+
+function renderFilterTabs() {
+    const cont = document.getElementById('filter-tabs-container');
+    cont.querySelectorAll('.dynamic-tab').forEach(t => t.remove());
+    allCategories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn dynamic-tab border border-white/10 px-5 py-2 rounded-xl font-bold text-sm transition';
+        btn.textContent = cat.name;
+        btn.onclick = (e) => filterProducts(cat.slug || cat.id, e);
+        cont.appendChild(btn);
+    });
+}
+
+function calcDiscount(product) {
+    const price = parseInt(product.price);
+    const type  = product.discount_type;
+    const val   = parseFloat(product.discount_value || 0);
+    if (!type || type === 'none' || val <= 0) return { finalPrice: price, oldPrice: null, label: null };
+    if (type === 'amount')  return { finalPrice: Math.max(price - val, 0), oldPrice: price, label: `خصم ${val} ج.م` };
+    if (type === 'percent') { const disc = Math.round(price * val / 100); return { finalPrice: Math.max(price - disc, 0), oldPrice: price, label: `خصم ${val}%` }; }
+    return { finalPrice: price, oldPrice: null, label: null };
+}
+
+function renderProducts(list) {
+    container.innerHTML = '';
+    if (!list || list.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center text-gray-500 py-10 font-bold">لا توجد منتجات متوفرة حالياً.</p>`;
+        return;
+    }
+    list.forEach(product => {
+        const { finalPrice, oldPrice, label } = calcDiscount(product);
+        const name   = product.name;
+        const imgSrc = product.image_url
+            ? product.image_url
+            : `https://placehold.co/300x300/111111/eab308?text=${encodeURIComponent(name.substring(0,12))}`;
+
+        const card = document.createElement('div');
+        card.className = 'product-card rounded-2xl md:rounded-3xl group flex flex-col';
+        card.setAttribute('data-aos', 'fade-up');
+        card.innerHTML = `
+            <div class="absolute top-3 right-3 z-10 flex items-center bg-black/70 px-2 py-1 rounded-full border border-white/10 backdrop-blur-sm">
+                <span class="status-dot dot-online"></span>
+                <span class="text-[8px] md:text-[10px] font-black text-green-400">متوفر الآن</span>
+            </div>
+            ${label ? `<div class="absolute top-3 left-3 z-10"><span class="discount-badge">${label}</span></div>` : ''}
+            <div class="prod-img-wrap relative h-40 sm:h-52 md:h-64 rounded-xl overflow-hidden bg-[#0a0a0a] flex items-center justify-center p-3 md:p-5 m-2 md:m-3">
+                <img src="${imgSrc}"
+                     class="h-full w-full object-contain rounded-lg transform group-hover:scale-110 transition duration-500"
+                     onerror="this.src='https://placehold.co/300x300/111111/eab308?text=ELBNA+STORE'" loading="lazy">
+            </div>
+            <div class="card-body p-3 md:p-5 text-right flex-grow flex flex-col">
+                <h3 class="text-sm md:text-lg font-black mb-2 md:mb-3 tracking-tight leading-snug line-clamp-2">${name}</h3>
+                <div class="mt-auto border-t border-white/5 pt-3">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex flex-col">
+                            ${oldPrice ? `<span class="old-price font-bold">${oldPrice} ج.م</span>` : ''}
+                            <span class="price-big text-xl md:text-2xl font-black text-yellow-500">${finalPrice} <small class="text-[10px] md:text-xs font-bold">ج.م</small></span>
+                        </div>
+                        <div class="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-lg">
+                            <span class="text-yellow-500 text-[8px] md:text-[10px] font-bold">${label ? label : 'سعر مميز'}</span>
+                        </div>
+                    </div>
+                    <button class="order-btn gradient-btn w-full py-2.5 md:py-3.5 rounded-xl font-black shadow-lg active:scale-95 text-xs md:text-sm transition"
+                            onclick="saveAndGo(this)">اشتري دلوقتي</button>
+                </div>
+            </div>`;
+        card.querySelector('.order-btn').dataset.name  = name;
+        card.querySelector('.order-btn').dataset.price = finalPrice;
+        card.querySelector('.order-btn').dataset.img   = imgSrc;
+        container.appendChild(card);
+    });
+    if (window.AOS) AOS.refresh();
+}
+
+function filterProducts(category, event) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    if (event && event.target) event.target.classList.add('active');
+    const filtered = category === 'all' ? allProducts : allProducts.filter(p => p.type === category);
+    renderProducts(filtered);
+}
+
+async function loadProducts() {
+    container.innerHTML = `<p class="col-span-full text-center text-gray-400 py-10 font-bold animate-pulse">جارٍ تحميل المنتجات...</p>`;
+    try {
+        const res  = await fetch('/api/products');
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+        allProducts = json.products || [];
+        renderProducts(allProducts);
+    } catch (err) {
+        container.innerHTML = `<p class="col-span-full text-center text-red-400 py-10 font-bold">تعذّر تحميل المنتجات. يرجى المحاولة لاحقاً.</p>`;
+    }
+}
+
+function loadReviews() {
+    const stored = localStorage.getItem('elbna_reviews');
+    if (!stored) return;
+    const reviews = JSON.parse(stored);
+    if (!reviews.length) return;
+    const cont = document.getElementById('reviews-container');
+    cont.innerHTML = '';
+    reviews.forEach((r, i) => {
+        const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+        const div = document.createElement('div');
+        div.className = 'review-card p-6 md:p-8';
+        div.setAttribute('data-aos','fade-up');
+        div.setAttribute('data-aos-delay', (i*100).toString());
+        div.innerHTML = `
+            <div class="flex items-center gap-4 mb-5">
+                <div class="w-11 h-11 bg-yellow-500 rounded-full flex items-center justify-center text-black font-black text-lg">${r.name.charAt(0)}</div>
+                <div><h4 class="font-bold">${r.name}</h4><p class="stars text-xs">${stars}</p></div>
+            </div>
+            <p class="text-gray-400 italic text-sm leading-relaxed">"${r.text}"</p>`;
+        cont.appendChild(div);
+    });
+    if (window.AOS) AOS.refresh();
+}
+
+function saveAndGo(btn) {
+    localStorage.setItem('selectedProduct', btn.dataset.name);
+    localStorage.setItem('selectedPrice',   btn.dataset.price);
+    localStorage.setItem('selectedImg',     btn.dataset.img);
+    window.location.href = 'product.html';
+}
+
+(async () => {
+    await loadCategories();
+    await loadProducts();
+    loadReviews();
+})();
+</script>
+</body>
+</html>
