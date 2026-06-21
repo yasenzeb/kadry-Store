@@ -1,20 +1,24 @@
-User-agent: [id].js admin.html api cart.html checkout.html git index.html logo.jpeg maintenance.html migration_discount.sql package.json product.html products.js README.md robots.txt seed.js success.html supabase_migration.sql supabase_schema.sql Untitled-1.text upload.js vercel.json
+User-agent: *
 Allow: /
 Allow: /index.html
-Allow: /cart.html
-Allow: /checkout.html
 Allow: /product.html
-Allow: /api/
-Disallow: /.vercel/
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /return-policy.html
 Disallow: /admin.html
-Disallow: /maintenance.html
+Disallow: /cart.html
+Disallow: /checkout.html
 Disallow: /success.html
+Disallow: /maintenance.html
+Disallow: /.vercel/
+Disallow: /api/
+
 Sitemap: https://kadry1.com/sitemap.xml
+
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 0
+
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
-Request-rate: 10/1m
-Crawl-delay: 0.5
