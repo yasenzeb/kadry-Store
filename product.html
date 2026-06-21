@@ -4,6 +4,22 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>KADRY Store - تفاصيل المنتج</title>
+<meta name="description" content="اكتشف أفضل الكوتشيات والأحذية الرياضية في مصر من KADRY Store. جودة عالية، أسعار مناسبة، وشحن سريع لجميع المحافظات."/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://kadry1.com/product.html"/>
+<!-- Open Graph -->
+<meta property="og:type" content="product"/>
+<meta property="og:site_name" content="KADRY Store"/>
+<meta property="og:url" content="https://kadry1.com/product.html"/>
+<meta property="og:title" content="KADRY Store - تفاصيل المنتج"/>
+<meta property="og:description" content="اكتشف أفضل الكوتشيات والأحذية الرياضية في مصر من KADRY Store."/>
+<meta property="og:image" content="https://kadry1.com/logo.jpeg"/>
+<meta property="og:locale" content="ar_EG"/>
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="KADRY Store - تفاصيل المنتج"/>
+<meta name="twitter:description" content="اكتشف أفضل الكوتشيات والأحذية الرياضية في مصر من KADRY Store."/>
+<meta name="twitter:image" content="https://kadry1.com/logo.jpeg"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -164,9 +180,16 @@
   </template>
 </section>
 
+<!-- WHATSAPP FLOATING BUTTON -->
+<a href="https://wa.me/77014738052" target="_blank" rel="noopener noreferrer" aria-label="تواصل معنا عبر واتساب"
+   style="position:fixed;bottom:90px;right:16px;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;z-index:999;box-shadow:0 4px 20px rgba(37,211,102,0.45);transition:all 0.15s;text-decoration:none;"
+   onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
 <!-- TOAST -->
 <div x-show="toast" x-transition class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black text-white font-black px-6 py-3 rounded-full shadow-xl z-50 text-sm">
-  ✅ تمت الإضافة للسلة!
+  تمت الإضافة للسلة!
 </div>
 
 <script>
@@ -205,6 +228,21 @@ function productPage() {
       this.activeImage = imgs[0] || 'https://placehold.co/600x500/111/000000?text=K';
 
       this.cartCount = this.getCart().length;
+
+      // Dynamic SEO update
+      if (this.product.name) {
+        const title = `${this.product.name} | KADRY Store`;
+        const desc  = `اشتري ${this.product.name} بسعر ${this.calcPrice()} ج.م من KADRY Store. شحن سريع لجميع محافظات مصر.`;
+        const img   = this.product.image_url || 'https://kadry1.com/logo.jpeg';
+        document.title = title;
+        document.querySelector('meta[name="description"]')?.setAttribute('content', desc);
+        document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);
+        document.querySelector('meta[property="og:description"]')?.setAttribute('content', desc);
+        document.querySelector('meta[property="og:image"]')?.setAttribute('content', img);
+        document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', title);
+        document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', desc);
+        document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', img);
+      }
     },
 
     calcPrice() {

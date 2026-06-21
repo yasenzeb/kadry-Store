@@ -5,11 +5,16 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+function requireAdmin(req) {
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '147258';
+  return req.headers['x-admin-password'] === ADMIN_PASSWORD;
+}
+
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-admin-password');
     return res.status(204).end();
   }
 
@@ -47,6 +52,10 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
+      if (!requireAdmin(req)) {
+        return res.status(403).json({ success: false, error: 'غير مصرح.' });
+      }
+
       const {
         name, type, price, image_url,
         discount_type, discount_value,
@@ -80,6 +89,10 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
+      if (!requireAdmin(req)) {
+        return res.status(403).json({ success: false, error: 'غير مصرح.' });
+      }
+
       const { error } = await supabase
         .from('products')
         .delete()
