@@ -15,18 +15,15 @@
 <nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
   <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
     <a href="index.html" class="flex items-center gap-2">
-      <div class="bg-black rounded-lg px-3 py-1 flex items-center gap-1">
-        <span class="text-white font-black text-lg tracking-widest">KADRY</span>
-        <span class="text-white font-black text-xl">Store</span>
-      </div>
+      <span class="text-black font-black text-xl tracking-widest">KADRY Store</span>
     </a>
-    <a href="index.html" class="text-sm font-bold text-gray-600 hover:text-green-500"><i class="fas fa-arrow-right ml-1"></i>متابعة التسوق</a>
+    <a href="index.html" class="text-sm font-bold text-gray-600 hover:text-black transition"><i class="fas fa-arrow-right ml-1"></i>متابعة التسوق</a>
   </div>
 </nav>
 
 <div class="max-w-6xl mx-auto px-4 py-10">
   <h1 class="text-3xl font-black mb-8 flex items-center gap-3">
-    <i class="fas fa-shopping-cart text-green-500"></i> سلة المشتريات
+    <i class="fas fa-shopping-cart text-black"></i> سلة المشتريات
     <span class="text-gray-400 text-lg font-bold" x-text="'('+cart.length+' منتج)'"></span>
   </h1>
 
@@ -36,7 +33,7 @@
       <div class="text-8xl mb-6">🛒</div>
       <p class="text-2xl font-black mb-3">السلة فاضية!</p>
       <p class="text-gray-500 mb-8">اضغط على أي منتج وأضفه للسلة</p>
-      <a href="index.html" class="bg-black text-white font-black px-10 py-4 rounded-full hover:bg-green-500 hover:text-black transition text-lg">تسوق الآن</a>
+      <a href="index.html" class="bg-black text-white font-black px-10 py-4 rounded-full hover:bg-gray-800 transition text-lg">تسوق الآن</a>
     </div>
   </template>
 
@@ -46,7 +43,7 @@
     <div class="lg:col-span-2 space-y-4">
       <template x-for="(item,idx) in cart" :key="idx">
         <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100">
-          <img :src="item.image_url || 'https://placehold.co/100x100/111/22c55e?text=M'"
+          <img :src="item.image_url || 'https://placehold.co/100x100/111/ffffff?text=K'"
                :alt="item.name" class="w-24 h-24 object-cover rounded-xl flex-shrink-0"/>
           <div class="flex-1 min-w-0">
             <h3 class="font-black text-base leading-snug mb-1 truncate" x-text="item.name"></h3>
@@ -84,15 +81,15 @@
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500">الشحن</span>
-            <span class="font-bold text-green-600">حسب المحافظه</span>
+            <span class="font-bold text-gray-600">حسب المحافظه</span>
           </div>
           <div class="border-t pt-3 flex justify-between text-xl font-black">
             <span>الإجمالي</span>
-            <span class="text-green-600" x-text="'EGP '+subtotal"></span>
+            <span class="text-black" x-text="'EGP '+subtotal"></span>
           </div>
         </div>
 
-        <a href="checkout.html" class="block w-full bg-black text-white font-black py-4 rounded-2xl text-center hover:bg-green-500 hover:text-black transition text-lg mb-3">
+        <a href="checkout.html" class="block w-full bg-black text-white font-black py-4 rounded-2xl text-center hover:bg-gray-800 transition text-lg mb-3">
           <i class="fas fa-credit-card ml-2"></i>إتمام الطلب
         </a>
         <a href="index.html" class="block w-full bg-gray-100 text-black font-bold py-3 rounded-2xl text-center hover:bg-gray-200 transition text-sm">

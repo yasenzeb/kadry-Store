@@ -96,7 +96,7 @@ html,body{overflow-x:hidden;width:100%;}
   --card:rgba(255,255,255,0.98);
 }
 
-body{background:var(--navy);color:var(--text);}
+body{background:var(--navy);color:var(--text);position:relative;}
 
 /* PRELOADER ANIMATION */
 #preloader {
@@ -251,7 +251,7 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
 .toast-popup{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#000 0%,#2a2a2a 100%);color:#fff;font-weight:900;padding:12px 28px;border-radius:2px;z-index:9999;font-size:0.9rem;pointer-events:none;box-shadow:4px 4px 0 rgba(0,0,0,0.3);}
 
 /* WHATSAPP */
-.wa-btn{position:fixed;bottom:90px;right:16px;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;z-index:100;box-shadow:0 4px 20px rgba(37,211,102,0.45);transition:all 0.15s;border:none}
+.wa-btn{position:absolute;bottom:90px;right:16px;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;z-index:100;box-shadow:0 4px 20px rgba(37,211,102,0.45);transition:all 0.15s;border:none}
 .wa-btn:hover{transform:scale(1.05);}
 @media(min-width:768px){.wa-btn{bottom:30px;right:30px;}}
 
@@ -560,7 +560,8 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
         <div class="flex flex-col gap-2 footer-text">
           <a href="privacy.html" class="hover:text-black transition">سياسة الخصوصية</a>
           <a href="terms.html" class="hover:text-black transition">الشروط والأحكام</a>
-          <a href="return-policy.html" class="hover:text-black transition">الاستبدال والاسترجاع</a>      </div>
+          <a href="return-policy.html" class="hover:text-black transition">الاستبدال والاسترجاع</a>
+        </div>
       </div>
       <div>
         <span class="footer-label">CONNECT</span>
