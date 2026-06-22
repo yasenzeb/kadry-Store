@@ -926,8 +926,8 @@ function store(){
       setTimeout(() => this.toast = false, 2500);
     },
     removeFromCart(key){ this.cart = this.cart.filter(i => i._key !== key); this.saveCart(); },
-    // ⚠️ ملاحظة أمنية: يتم حفظ finalPrice في localStorage لعرضه فقط في السلة.
-    // لا يجب الاعتماد على أي سعر/خصم/إجمالي قادم من localStorage أو المتصفح كمصدر موثوق للدفع الفعلي،
+    // ⚠️ ملاحظة أمنية: يتم  finalPrice في localStorage لعرضه فقط في السلة.
+    // لا يجب الاعتماد على أي سعر/خصم/إجمالي  من localStorage أو المتصفح كمصدر موثوق للدفع الفعلي،
     // لأن المستخدم يمكنه تعديل قيم المتصفح بسهولة. أي عملية دفع حقيقية يجب أن تُحسب وتُتحقق من جهة السيرفر.
     saveCart(){ localStorage.setItem('kadry_cart', JSON.stringify(this.cart)); this.cartCount = this.cart.length; }
   }
