@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' https: data:; connect-src 'self'; frame-ancestors 'none'"/>
 
 <title>كادري ستور - Kadry Store | أفضل متجر أحذية وكوتشيات رجالي في مصر</title>
 <meta name="description" content="كادري ستور: مكان كل الناس لأحدث صيحات الأحذية وكوتشيات رجالي، سليبرز، وأحذية رياضية. تشكيلة مميزة ومبتكرة بأعلى جودة وأفضل سعر في مصر مع شحن سريع لجميع المحافظات. اطلب الآن!"/>
@@ -123,7 +126,7 @@
 اسعار الكوتشيات الاوريجينال في ديرب نجم
 عروض المحلات في ديرب نجم احذية
 خصومات محلات جزم ديرب نجم
-كوتشيات شبابي خفيفة ومريحة ديرب نجم
+كوتشيات شبابي خفيفة ومري��ة ديرب نجم
 احذية رجالي طبية مريحة ديرب نجم
 كوتشيات تريندات تيك توك ديرب نجم
 كوتشيات تريند انستجرام ديرب نجم
@@ -132,7 +135,7 @@
 عنوان فرع كادري ديرب نجم بالظبط
 رقم تليفون فرع كادري ديرب نجم
 مواعيد فتح محل كادري ديرب نجم
-كوتشيات رجالي مقاس 41 الى 45 ديرب نجم
+كوتشيات رجالي مقاس 41 ا��ى 45 ديرب نجم
 كوتشيات شبابي ابيض واسود تريند ديرب نجم
 احسن ماركات كوتشيات في ديرب نجم كادري
 اشهر وافضل محل جزم رجالي بديرب
@@ -245,16 +248,16 @@ html,body{overflow-x:hidden;width:100%;}
 
 :root{
   --navy:#ffffff;
-  --navy2:#ffffff;
+  --navy2:#f8f8f8;
   --navy3:#f5f5f5;
-  --blue:#000000;
-  --blue2:#000000;
-  --blue3:#000000;
+  --blue:#1a1a1a;
+  --blue2:#2a2a2a;
+  --blue3:#3a3a3a;
   --accent:#000000;
   --accent2:rgba(0,0,0,0.6);
   --accent3:rgba(0,0,0,0.04);
-  --text:#000000;
-  --muted:rgba(0,0,0,0.5);
+  --text:#1a1a1a;
+  --muted:rgba(0,0,0,0.6);
   --border:rgba(0,0,0,0.08);
   --card:rgba(255,255,255,0.98);
 }
@@ -534,7 +537,7 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
         <div class="hero-stat-divider"></div>
         <div class="hero-stats text-center">
           <strong>100%</strong>
-          <span>جودة مضمونة</span>
+          <span>جودة مضمون��</span>
         </div>
       </div>
     </div>
@@ -808,24 +811,6 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
 </div>
 
 <!-- SIZE PICKER MODAL -->
-<div x-show="sizePickerOpen" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[110] flex items-center justify-center p-4" x-transition.opacity x-cloak>
-  <div class="bg-white w-full max-w-sm p-8 relative" @click.stop>
-    <h3 class="font-black text-lg mb-2" x-text="selectedProd?.name"></h3>
-    <p class="text-sm text-muted mb-6">يرجى اختيار المقاس المطلوب للمتابعة</p>
-    <div class="grid grid-cols-4 gap-2 mb-8">
-      <template x-for="size in [37,38,39,40,41,42,43,44,45]">
-        <button @click="selectedSize=size"
-                :class="selectedSize===size ? 'bg-black text-white border-black' : 'border-gray-200 text-gray-400'"
-                class="h-12 border-2 font-bold transition-all hover:border-black flex items-center justify-center" x-text="size"></button>
-      </template>
-    </div>
-    <div class="flex gap-3">
-      <button @click="sizePickerOpen=false" class="hero-cta-sec flex-1 justify-center">إلغاء</button>
-      <button @click="confirmAddToCart()" class="hero-cta-main flex-1 justify-center">تأكيد</button>
-    </div>
-  </div>
-</div>
-
 <!-- WHATSAPP -->
 <a href="https://wa.me/77014738052" target="_blank" aria-label="تواصل معنا عبر واتساب" class="wa-btn"><i class="fab fa-whatsapp"></i></a>
 
@@ -845,7 +830,7 @@ function store(){
   return{
     products:[],categories:[],reviews:[],activeFilter:'',searchQuery:'',loadingProds:true,loadingCats:true,
     mobileMenu:false,cartCount:0,toast:false,cartOpen:false,cart:[],
-    sizePickerOpen:false,selectedProd:null,selectedSize:null,
+
     get cartTotal(){ return this.cart.reduce((sum, i) => sum + (this.calcPrice(i) * (i.qty || 1)), 0); },
     async init(){
       this.cart = this.getCart();
@@ -898,33 +883,7 @@ function store(){
     filterByCategory(slug){this.activeFilter=slug;document.getElementById('products').scrollIntoView({behavior:'smooth'});},
     goToProduct(p){localStorage.setItem('kadry_product',JSON.stringify(p));window.location.href='product.html';},
     getCart(){try{return JSON.parse(localStorage.getItem('kadry_cart')||'[]');}catch{return[];}},
-    openSizePicker(p){
-      this.selectedProd = p;
-      this.selectedSize = null;
-      this.sizePickerOpen = true;
-    },
-    confirmAddToCart(){
-      if(!this.selectedSize) { alert('من فضلك اختر المقاس أولاً'); return; }
-      const p = this.selectedProd;
-      const itemKey = `${p.id}-${this.selectedSize}`;
-      const idx = this.cart.findIndex(i => i._key === itemKey);
 
-      if(idx > -1) {
-        this.cart[idx].qty++;
-      } else {
-        this.cart.push({
-          ...p,
-          _key: itemKey,
-          size: this.selectedSize,
-          qty: 1,
-          finalPrice: this.calcPrice(p)
-        });
-      }
-      this.saveCart();
-      this.sizePickerOpen = false;
-      this.toast = true;
-      setTimeout(() => this.toast = false, 2500);
-    },
     removeFromCart(key){ this.cart = this.cart.filter(i => i._key !== key); this.saveCart(); },
     // ⚠️ ملاحظة أمنية: يتم  finalPrice في localStorage لعرضه فقط في السلة.
     // لا يجب الاعتماد على أي سعر/خصم/إجمالي  من localStorage أو المتصفح كمصدر موثوق للدفع الفعلي،
