@@ -66,15 +66,26 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'name, type, and price are required.' });
       }
 
+      const parsedPrice = parseFloat(price);
+      if (!isFinite(parsedPrice) || parsedPrice < 0) {
+        return res.status(400).json({ success: false, error: 'السعر يجب أن يكون رقماً صحيحاً أكبر من أو يساوي صفر.' });
+      }
+
+      const parsedDiscountType  = discount_type || 'none';
+      const parsedDiscountValue = parseFloat(discount_value) || 0;
+      if (parsedDiscountType !== 'none' && (!isFinite(parsedDiscountValue) || parsedDiscountValue < 0)) {
+        return res.status(400).json({ success: false, error: 'قيمة الخصم يجب أن تكون رقماً صحيحاً أكبر من أو يساوي صفر.' });
+      }
+
       const { data, error } = await supabase
         .from('products')
         .insert([{
           name,
           type,
-          price:            parseInt(price),
-          image_url:        image_url        || null,
-          discount_type:    discount_type    || 'none',
-          discount_value:   discount_value   || 0,
+          price:            parsedPrice,
+          image_url:        image_url              || null,
+          discount_type:    parsedDiscountType,
+          discount_value:   parsedDiscountType === 'none' ? 0 : parsedDiscountValue,
           sizes:            sizes            || [],
           colors:           colors           || [],
           gallery:          gallery          || [],

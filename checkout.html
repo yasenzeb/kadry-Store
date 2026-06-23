@@ -438,15 +438,14 @@ const SHIPPING_RATES = {
   'السويس': 95
 };
 
-/* ── Pushover via server (keys are in environment variables, never exposed to client) ── */
-async function pushover(title, message) {
-  try {
-    await fetch('/api/checkout', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ title, message }),
-    });
-  } catch (e) { console.error('[pushover]', e); }
+/* ── Submit structured order to server ── */
+async function placeOrder(payload) {
+  const resp = await fetch('/api/checkout', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
+  });
+  return resp.json();
 }
 
 /* ── Alpine Component ── */
@@ -536,8 +535,8 @@ function checkoutPage() {
           r.readAsDataURL(file);
         });
 
-        /* Upload via project API */
-        const resp   = await fetch('/api/upload', {
+        /* Upload via public receipt endpoint (no admin auth required) */
+        const resp   = await fetch('/api/upload-receipt', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ data: base64, fileName: file.name })
@@ -546,23 +545,6 @@ function checkoutPage() {
         if (!result.success) throw new Error(result.error || 'فشل الرفع');
 
         this.paymentProof = result.url;
-
-        /* Notify admin about receipt */
-        const msg =
-`━━━━━━━━━━━━━━ 📎 صورة تحويل جديدة ━━━━━━━━━━━━━━
-🆔 رقم الطلب : ${this.orderNumber}
-👤 الاسم     : ${this.form.name.trim()}
-📞 الهاتف    : ${this.form.phone.trim()}
-📍 المحافظة  : ${this.form.gov}
-💰 رسوم الشحن: EGP ${this.savedShipping}
-
-🖼️ صورة التحويل:
-${result.url}
-
-━━━━━━━━━━━━━━ 📩 رسالة للعميل ━━━━━━━━━━━━━━
-تم استلام صورة التحويل بنجاح وجاري تجهيز الطلب للشحن`;
-
-        await pushover(`💳 إيصال تحويل — طلب ${this.orderNumber}`, msg);
 
       } catch (err) {
         this.uploadError = 'فشل رفع الصورة: ' + (err.message || 'خطأ غير متوقع');
@@ -578,55 +560,51 @@ ${result.url}
     async submitOrder() {
       if (!this.validate()) return;
 
-      this.submitting     = true;
-      this.submitError    = '';
-      this.savedShipping  = this.shippingCost;
+      this.submitting    = true;
+      this.submitError   = '';
+      this.savedShipping = this.shippingCost;
 
-      const shipping = this.shippingCost;
-      const total    = this.subtotal + shipping;
+      /* Build structured items payload — server will re-fetch authoritative prices */
+      const structuredItems = this.cart.map(i => ({
+        productId: i.id,
+        size:      i.size  || null,
+        color:     i.color || null,
+        qty:       i.qty   || 1,
+      }));
 
-      this.orderNumber = 'K-' + Math.floor(100000 + Math.random() * 900000);
+      try {
+        const result = await placeOrder({
+          customerName:    this.form.name.trim(),
+          customerPhone:   this.form.phone.trim(),
+          governorate:     this.form.gov,
+          address:         this.form.address.trim(),
+          notes:           this.form.notes.trim() || '',
+          paymentMethod:   this.form.payment,
+          items:           structuredItems,
+          paymentProofUrl: this.paymentProof || null,
+        });
 
-      /* Build items text */
-      const itemsText = this.cart.map(i => {
-        const parts = [];
-        if (i.size)  parts.push(`مقاس: ${i.size}`);
-        if (i.color) parts.push(`لون: ${i.color}`);
-        const detail = parts.length ? ` [${parts.join(' — ')}]` : '';
-        return `• ${i.name}${detail}\n  الكمية: ${i.qty||1} | السعر: EGP ${(i.finalPrice||i.price)*(i.qty||1)}`;
-      }).join('\n\n');
+        if (!result.success) {
+          this.submitError = result.error || 'فشل إرسال الطلب. حاول مرة أخرى.';
+          this.submitting  = false;
+          return;
+        }
 
-      const paymentLabel = this.form.payment === 'cod' ? 'الدفع عند الاستلام' : 'تحويل إلكتروني';
+        /* Use server-returned values */
+        this.orderNumber  = result.orderNumber;
+        this.savedShipping = this.shippingCost;
 
-      /* ── Admin Message ── */
-      const adminMsg =
-`━━━━━━━━━━━━━━ 🛒 طلب جديد KADRY ━━━━━━━━━━━━━━
-🆔 رقم الطلب  : ${this.orderNumber}
-👤 الاسم      : ${this.form.name.trim()}
-📞 الهاتف     : ${this.form.phone.trim()}
-📍 المحافظة   : ${this.form.gov}
-🏠 العنوان    : ${this.form.address.trim()}
-💳 طريقة الدفع: ${paymentLabel}
-📝 ملاحظات    : ${this.form.notes.trim() || 'لا يوجد'}
+        localStorage.removeItem('kadry_cart');
+        this.orderDone  = true;
+        this.submitting = false;
 
-📦 المنتجات:
-${itemsText}
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
-💰 المجموع   : EGP ${this.subtotal}
-🚚 الشحن     : EGP ${shipping}
-✅ الإجمالي  : EGP ${total}
-
-━━━━━━━━━━━━━━ 📩 نسخة جاهزة للعميل ━━━━━━━━━━━━━━
-تم حجز الطلب بنجاح ويمكنك إرسال صورة التحويل لتسريع الشحن`;
-
-      await pushover('🛒 طلب جديد من الموقع!', adminMsg);
-
-      localStorage.removeItem('kadry_cart');
-      this.orderDone  = true;
-      this.submitting = false;
-
-      /* Scroll to top */
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[submitOrder]', err);
+        this.submitError = 'خطأ في الاتصال. حاول مرة أخرى.';
+        this.submitting  = false;
+      }
     }
   };
 }

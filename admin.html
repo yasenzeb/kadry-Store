@@ -260,6 +260,8 @@ tbody td{padding:12px 14px;vertical-align:middle}
       <div class="nav-section">المنتجات</div>
       <div class="nav-item" data-panel="add-product" onclick="switchPanel(this)"><i class="fas fa-plus-circle"></i> إضافة منتج</div>
       <div class="nav-item" data-panel="manage" onclick="switchPanel(this)"><i class="fas fa-shoe-prints"></i> إدارة المنتجات</div>
+      <div class="nav-section">الطلبات</div>
+      <div class="nav-item" data-panel="orders" onclick="switchPanel(this)"><i class="fas fa-shopping-bag"></i> الطلبات</div>
       <div class="nav-section">الإعدادات</div>
       <div class="nav-item" data-panel="categories" onclick="switchPanel(this)"><i class="fas fa-tags"></i> إدارة الفئات</div>
       <div class="nav-item" data-panel="reviews" onclick="switchPanel(this)"><i class="fas fa-star"></i> إدارة الآراء</div>
@@ -285,6 +287,7 @@ tbody td{padding:12px 14px;vertical-align:middle}
         <div class="stat-card"><div class="stat-icon red"><i class="fas fa-shoe-prints"></i></div><div><div class="stat-val" id="stat-sports">—</div><div class="stat-lbl">رياضية</div></div></div>
         <div class="stat-card"><div class="stat-icon purple"><i class="fas fa-tags"></i></div><div><div class="stat-val" id="stat-cats">—</div><div class="stat-lbl">الفئات</div></div></div>
         <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-star"></i></div><div><div class="stat-val" id="stat-reviews">—</div><div class="stat-lbl">الآراء</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-shopping-bag"></i></div><div><div class="stat-val" id="stat-orders">—</div><div class="stat-lbl">الطلبات</div></div></div>
       </div>
       <div class="table-wrap">
         <div class="table-toolbar">
@@ -412,6 +415,24 @@ tbody td{padding:12px 14px;vertical-align:middle}
             <thead><tr><th>اسم الفئة</th><th>المعرف</th><th>عدد المنتجات</th><th>الإجراءات</th></tr></thead>
             <tbody id="categories-table-body">
               <tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin" style="color:var(--gold)"></i>جارٍ التحميل...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="panel" id="panel-orders">
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 style="font-weight:900;font-size:.95rem"><i class="fas fa-shopping-bag" style="color:var(--gold);margin-left:8px"></i> الطلبات</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadOrders()"><i class="fas fa-sync-alt"></i> تحديث</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>رقم الطلب</th><th>الاسم</th><th>الهاتف</th><th>المحافظة</th><th>الإجمالي</th><th>الدفع</th><th>الحالة</th><th>التاريخ</th><th>الإجراءات</th></tr></thead>
+            <tbody id="orders-table-body">
+              <tr><td colspan="9"><div class="empty-state"><i class="fas fa-spinner fa-spin" style="color:var(--gold)"></i>جارٍ التحميل...</div></td></tr>
             </tbody>
           </table>
         </div>
@@ -607,6 +628,7 @@ async function showApp(){
   await loadCategories();
   await loadAllProducts();
   loadReviews();
+  loadOrders();
 }
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);location.reload();}
 checkAuth();
@@ -626,6 +648,7 @@ function switchPanel(el){
   if(p==='manage'||p==='dashboard')loadAllProducts();
   if(p==='categories')loadCategories();
   if(p==='reviews')loadReviews();
+  if(p==='orders')loadOrders();
 }
 function switchPanelById(id){const el=document.querySelector(`[data-panel="${id}"]`);if(el)switchPanel(el);}
 
@@ -649,7 +672,7 @@ async function api(method,path,body){
 }
 
 /* ══ STATE ══ */
-var allProducts=[],filteredProducts=[],allCategories=[],allReviews=[];
+var allProducts=[],filteredProducts=[],allCategories=[],allReviews=[],allOrders=[];
 let currentFilter='all',currentPage=1;
 const PER_PAGE=10;
 let editingProductId=null,deletingProductId=null,deletingCatId=null,deletingRevId=null;
@@ -681,10 +704,10 @@ function renderGalleryGrid(containerId, contextId){
       div.innerHTML=`<div class="slot-placeholder"><i class="fas fa-spinner fa-spin" style="color:var(--gold)"></i><span>جارٍ الرفع...</span></div><div class="gallery-slot .slot-num">${i+1}</div><div class="upload-progress-bar" id="gpb-${contextId}-${i}" style="width:0%"></div>`;
     } else if(slot&&slot.url){
       div.innerHTML=`
-        <img src="${slot.url}" alt="صورة ${i+1}">
+        <img src="${htmlEsc(slot.url)}" alt="صورة ${i+1}">
         <div class="slot-num">${isMain?'رئيسية':i+1}</div>
-        <button class="remove-img" onclick="removeGallerySlot('${containerId}','${contextId}',${i})" title="حذف"><i class="fas fa-times"></i></button>
-        <button class="set-main-btn" onclick="setMainImage('${containerId}','${contextId}',${i})">${isMain?'✓ رئيسية':'تعيين رئيسية'}</button>
+        <button class="remove-img" onclick="removeGallerySlot('${htmlEsc(containerId)}','${htmlEsc(contextId)}',${i})" title="حذف"><i class="fas fa-times"></i></button>
+        <button class="set-main-btn" onclick="setMainImage('${htmlEsc(containerId)}','${htmlEsc(contextId)}',${i})">${isMain?'✓ رئيسية':'تعيين رئيسية'}</button>
       `;
     } else {
       div.innerHTML=`
@@ -765,10 +788,10 @@ function renderCategoriesTable(){
   tbody.innerHTML=allCategories.map(cat=>{
     const count=allProducts.filter(p=>p.type===cat.slug).length;
     return `<tr>
-      <td><strong>${cat.name}</strong></td>
-      <td><code style="background:var(--surface);padding:2px 8px;border-radius:6px;font-size:.8rem">${cat.slug}</code></td>
+      <td><strong>${htmlEsc(cat.name)}</strong></td>
+      <td><code style="background:var(--surface);padding:2px 8px;border-radius:6px;font-size:.8rem">${htmlEsc(cat.slug)}</code></td>
       <td><span class="badge" style="background:rgba(234,179,8,.1);color:var(--gold)">${count} منتج</span></td>
-      <td><div class="actions-col"><button class="btn btn-red btn-sm" onclick="openDeleteCatModal('${cat.id}','${cat.name}')"><i class="fas fa-trash"></i> حذف</button></div></td>
+      <td><div class="actions-col"><button class="btn btn-red btn-sm" onclick="openDeleteCatModal('${htmlEsc(cat.id)}','${htmlEsc(cat.name)}')"><i class="fas fa-trash"></i> حذف</button></div></td>
     </tr>`;
   }).join('');
 }
@@ -910,6 +933,7 @@ function updateStats(){
   document.getElementById('stat-sneakers').textContent=(allProducts||[]).filter(p=>p.type==='sneakers').length;
   document.getElementById('stat-slippers').textContent=(allProducts||[]).filter(p=>p.type==='slippers').length;
   document.getElementById('stat-sports').textContent=(allProducts||[]).filter(p=>p.type==='sports').length;
+  document.getElementById('stat-orders').textContent=(allOrders||[]).length;
 }
 
 function renderRecentTable(){
@@ -920,9 +944,9 @@ function renderRecentTable(){
     <thead><tr><th>الصور</th><th>الاسم</th><th>الفئة</th><th>السعر</th><th>الخصم</th></tr></thead>
     <tbody>${recent.map(p=>`<tr>
       <td>${buildThumbsHtml(p)}</td>
-      <td><div class="prod-name">${p.name}</div></td>
+      <td><div class="prod-name">${htmlEsc(p.name)}</div></td>
       <td>${badgeHTML(p.type)}</td>
-      <td class="price-col">${p.price} ج.م</td>
+      <td class="price-col">${htmlEsc(String(p.price))} ج.م</td>
       <td class="discount-col">${discountLabel(p)}</td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -932,7 +956,7 @@ function buildThumbsHtml(p){
   const mainImg=p.image_url||gallery[0]||null;
   if(!mainImg)return`<div class="prod-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="fas fa-image"></i></div>`;
   const extra=gallery.length>1?`<span style="font-size:.65rem;color:var(--muted);display:block;margin-top:2px">+${gallery.length} صور</span>`:'';
-  return`<div style="display:flex;flex-direction:column;align-items:center"><img class="prod-thumb" src="${mainImg}" onerror="this.src='https://placehold.co/46x46/111/eab308?text=?'">
+  return`<div style="display:flex;flex-direction:column;align-items:center"><img class="prod-thumb" src="${htmlEsc(mainImg)}" onerror="this.src='https://placehold.co/46x46/111/eab308?text=?'">
     ${extra}</div>`;
 }
 
@@ -955,13 +979,13 @@ function renderProductsTable(){
   const page=filteredProducts.slice(start,start+PER_PAGE);
   tbody.innerHTML=page.map(p=>`<tr>
     <td>${buildThumbsHtml(p)}</td>
-    <td><div class="prod-name">${p.name}</div></td>
+    <td><div class="prod-name">${htmlEsc(p.name)}</div></td>
     <td>${badgeHTML(p.type)}</td>
-    <td class="price-col">${p.price} ج.م</td>
+    <td class="price-col">${htmlEsc(String(p.price))} ج.م</td>
     <td class="discount-col">${discountLabel(p)}</td>
     <td><div class="actions-col">
-      <button class="btn btn-blue btn-sm" onclick="openEditModal('${p.id}')"><i class="fas fa-edit"></i> تعديل</button>
-      <button class="btn btn-red btn-sm" onclick="openDeleteModal('${p.id}',\`${esc(p.name)}\`)"><i class="fas fa-trash"></i> حذف</button>
+      <button class="btn btn-blue btn-sm" onclick="openEditModal('${htmlEsc(p.id)}')"><i class="fas fa-edit"></i> تعديل</button>
+      <button class="btn btn-red btn-sm" onclick="openDeleteModal('${htmlEsc(p.id)}',\`${esc(p.name)}\`)"><i class="fas fa-trash"></i> حذف</button>
     </div></td>
   </tr>`).join('');
   updatePagination();
@@ -1002,7 +1026,7 @@ function setColorsInContainer(containerId,colors){document.getElementById(contai
 function badgeHTML(type){
   const cat=allCategories.find(c=>c.slug===type||c.id===type);
   const name=cat?cat.name:type;
-  return`<span class="badge badge-custom">${name}</span>`;
+  return`<span class="badge badge-custom">${htmlEsc(name)}</span>`;
 }
 
 function updatePagination(){
@@ -1147,6 +1171,70 @@ async function confirmDelete(){
     await loadAllProducts();
   }catch(err){toast('خطأ: '+err.message,'error');}
   finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-trash"></i> حذف نهائياً';}
+}
+
+/* ══ ORDERS ══ */
+const ORDER_STATUS_LABELS = {
+  pending:   'معلق',
+  confirmed: 'مؤكد',
+  shipped:   'جارٍ الشحن',
+  delivered: 'تم التسليم',
+  cancelled: 'ملغي',
+};
+const ORDER_STATUS_COLORS = {
+  pending:   'var(--orange)',
+  confirmed: 'var(--blue)',
+  shipped:   'var(--purple)',
+  delivered: 'var(--green)',
+  cancelled: 'var(--red)',
+};
+
+async function loadOrders(){
+  try{
+    const data=await api('GET','/api/orders');
+    if(!data.success)throw new Error(data.error);
+    allOrders=data.orders||[];
+    renderOrdersTable();updateStats();
+  }catch(err){toast('فشل تحميل الطلبات: '+err.message,'error');}
+}
+
+function renderOrdersTable(){
+  const tbody=document.getElementById('orders-table-body');
+  if(!tbody)return;
+  if(!allOrders.length){tbody.innerHTML='<tr><td colspan="9"><div class="empty-state"><i class="fas fa-shopping-bag"></i>لا توجد طلبات بعد.</div></td></tr>';return;}
+  tbody.innerHTML=allOrders.map(o=>{
+    const date=new Date(o.created_at).toLocaleDateString('ar-EG',{year:'numeric',month:'short',day:'numeric'});
+    const statusLabel=ORDER_STATUS_LABELS[o.status]||htmlEsc(o.status);
+    const statusColor=ORDER_STATUS_COLORS[o.status]||'var(--muted)';
+    const payLabel=o.payment_method==='cod'?'عند الاستلام':'تحويل';
+    return `<tr>
+      <td><strong>${htmlEsc(o.order_number)}</strong></td>
+      <td>${htmlEsc(o.customer_name)}</td>
+      <td dir="ltr">${htmlEsc(o.customer_phone)}</td>
+      <td>${htmlEsc(o.governorate)}</td>
+      <td class="price-col">${htmlEsc(String(o.total))} ج.م</td>
+      <td>${htmlEsc(payLabel)}</td>
+      <td><span class="badge" style="background:${statusColor}22;color:${statusColor}">${statusLabel}</span></td>
+      <td>${htmlEsc(date)}</td>
+      <td><div class="actions-col">
+        <select class="form-group" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Cairo',sans-serif;font-size:.78rem;padding:5px 8px;border-radius:8px;outline:none"
+          onchange="updateOrderStatus('${htmlEsc(o.id)}',this.value)">
+          ${Object.entries(ORDER_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${o.status===v?' selected':''}>${l}</option>`).join('')}
+        </select>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateOrderStatus(id,status){
+  try{
+    const data=await api('PUT',`/api/orders/${id}`,{status});
+    if(!data.success)throw new Error(data.error);
+    const idx=allOrders.findIndex(o=>o.id===id);
+    if(idx>-1)allOrders[idx].status=status;
+    renderOrdersTable();
+    toast('✓ تم تحديث حالة الطلب','success');
+  }catch(err){toast('خطأ: '+err.message,'error');loadOrders();}
 }
 
 /* ── Auto-slug ── */

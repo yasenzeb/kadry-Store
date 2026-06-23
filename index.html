@@ -553,6 +553,7 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
           <a href="cart.html" class="hover:text-black transition">حقيبة التسوق</a>
           <a href="#about" class="hover:text-black transition">من نحن</a>
           <a href="contact.html" class="hover:text-black transition">تواصل معنا</a>
+          <a href="https://www.google.com/maps/search/?api=1&query=Kadry+Store+Deyarb+Negm" target="_blank" rel="noopener noreferrer" class="hover:text-black transition">موقعنا</a>
         </div>
       </div>
       <div>
@@ -732,7 +733,7 @@ function store(){
     },
     isNew(p){if(!p.created_at) return false; return (Date.now()-new Date(p.created_at))<7*24*60*60*1000;},
     filterByCategory(slug){this.activeFilter=slug;document.getElementById('products').scrollIntoView({behavior:'smooth'});},
-    goToProduct(p){localStorage.setItem('kadry_product',JSON.stringify(p));window.location.href='product.html';},
+    goToProduct(p){localStorage.setItem('kadry_product',JSON.stringify(p));window.location.href='product.html?id='+encodeURIComponent(p.id);},
     getCart(){try{return JSON.parse(localStorage.getItem('kadry_cart')||'[]');}catch{return[];}},
     openSizePicker(p){
       this.selectedProd = p;

@@ -208,32 +208,74 @@ function productPage() {
     activeImage: '',
     allImages: [],
 
-    init() {
-      try { this.product = JSON.parse(localStorage.getItem('kadry_product') || '{}'); } catch {}
+    async init() {
+      this.cartCount = this.getCart().length;
 
-      if (Array.isArray(this.product.sizes) && this.product.sizes.length)
-        this.sizes = this.product.sizes;
-      if (Array.isArray(this.product.colors) && this.product.colors.length)
-        this.colors = this.product.colors;
+      // Read id from URL query string
+      const urlId = new URLSearchParams(window.location.search).get('id');
 
-      const gallery = Array.isArray(this.product.gallery) ? this.product.gallery.filter(Boolean) : [];
-      const mainImg = this.product.image_url || null;
+      // Fast-path: show cached data immediately while fetch is in-flight
+      if (urlId) {
+        try {
+          const cached = JSON.parse(localStorage.getItem('kadry_product') || '{}');
+          if (cached && cached.id === urlId) {
+            this._applyProduct(cached);
+          }
+        } catch {}
+      } else {
+        // No id in URL — fall back to localStorage only (legacy deep link)
+        try {
+          const cached = JSON.parse(localStorage.getItem('kadry_product') || '{}');
+          if (cached && cached.id) {
+            this._applyProduct(cached);
+          }
+        } catch {}
+        return; // nothing to fetch without an id
+      }
+
+      // Fetch authoritative data from API
+      try {
+        const resp = await fetch(`/api/products/${encodeURIComponent(urlId)}`);
+        if (resp.status === 404) {
+          this.product = {}; // trigger "not found" state
+          return;
+        }
+        const data = await resp.json();
+        if (data.success && data.product) {
+          this._applyProduct(data.product);
+        } else {
+          this.product = {};
+        }
+      } catch (err) {
+        console.error('[product.html] fetch failed:', err);
+        // Keep cached data if fetch fails — do not clear product
+      }
+    },
+
+    _applyProduct(p) {
+      this.product = p;
+
+      if (Array.isArray(p.sizes) && p.sizes.length)
+        this.sizes = p.sizes;
+      if (Array.isArray(p.colors) && p.colors.length)
+        this.colors = p.colors;
+
+      const gallery = Array.isArray(p.gallery) ? p.gallery.filter(Boolean) : [];
+      const mainImg = p.image_url || null;
 
       const seen = new Set();
       const imgs = [];
       if (mainImg) { imgs.push(mainImg); seen.add(mainImg); }
       gallery.forEach(u => { if (u && !seen.has(u)) { imgs.push(u); seen.add(u); } });
 
-      this.allImages = imgs;
+      this.allImages  = imgs;
       this.activeImage = imgs[0] || 'https://placehold.co/600x500/111/000000?text=K';
 
-      this.cartCount = this.getCart().length;
-
-      // Dynamic SEO update
-      if (this.product.name) {
-        const title = `${this.product.name} | KADRY Store`;
-        const desc  = `اشتري ${this.product.name} بسعر ${this.calcPrice()} ج.م من KADRY Store. شحن سريع لجميع محافظات مصر.`;
-        const img   = this.product.image_url || 'https://kadry1.com/logo.jpeg';
+      // Dynamic SEO
+      if (p.name) {
+        const title = `${p.name} | KADRY Store`;
+        const desc  = `اشتري ${p.name} من KADRY Store. شحن سريع لجميع محافظات مصر.`;
+        const img   = p.image_url || 'https://kadry1.com/logo.jpeg';
         document.title = title;
         document.querySelector('meta[name="description"]')?.setAttribute('content', desc);
         document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);

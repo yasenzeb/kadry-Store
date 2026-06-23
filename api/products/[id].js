@@ -67,17 +67,39 @@ export default async function handler(req, res) {
 
       const updates = {};
 
-      if (name             !== undefined) updates.name             = name;
-      if (type             !== undefined) updates.type             = type;
-      if (price            !== undefined) updates.price            = parseInt(price);
-      if (image_url        !== undefined) updates.image_url        = image_url;
-      if (discount_type    !== undefined) updates.discount_type    = discount_type;
-      if (discount_value   !== undefined) updates.discount_value   = discount_type === 'none' ? 0 : parseFloat(discount_value) || 0;
+      if (name      !== undefined) updates.name = name;
+      if (type      !== undefined) updates.type = type;
+      if (image_url !== undefined) updates.image_url = image_url;
+
+      if (price !== undefined) {
+        const parsedPrice = parseFloat(price);
+        if (!isFinite(parsedPrice) || parsedPrice < 0) {
+          return res.status(400).json({ success: false, error: 'السعر يجب أن يكون رقماً صحيحاً أكبر من أو يساوي صفر.' });
+        }
+        updates.price = parsedPrice;
+      }
+
+      if (discount_type !== undefined) {
+        updates.discount_type = discount_type;
+      }
+      if (discount_value !== undefined) {
+        const resolvedType = discount_type !== undefined ? discount_type : undefined;
+        if (resolvedType !== 'none' && discount_value !== undefined) {
+          const parsedDV = parseFloat(discount_value);
+          if (!isFinite(parsedDV) || parsedDV < 0) {
+            return res.status(400).json({ success: false, error: 'قيمة الخصم يجب أن تكون رقماً صحيحاً أكبر من أو يساوي صفر.' });
+          }
+          updates.discount_value = parsedDV;
+        } else {
+          updates.discount_value = 0;
+        }
+      }
       if (sizes            !== undefined) updates.sizes            = sizes;
       if (colors           !== undefined) updates.colors           = colors;
       if (gallery          !== undefined) updates.gallery          = gallery;
       if (main_image_index !== undefined) updates.main_image_index = main_image_index;
 
+      // Ensure discount_value is zero when discount_type is 'none'
       if (updates.discount_type === 'none') updates.discount_value = 0;
 
       const { data, error } = await supabase
