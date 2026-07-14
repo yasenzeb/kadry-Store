@@ -530,7 +530,6 @@ function checkoutPage() {
         color:     i.color || null,
         qty:       i.qty   || 1,
       }));
-
       try {
         const result = await placeOrder({
           customerName:    this.form.name.trim(),
