@@ -164,8 +164,8 @@
         <div class="space-y-3 max-h-72 overflow-y-auto mb-4">
           <template x-for="item in cart" :key="item._key||item.id">
             <div class="flex items-center gap-3">
-              <img :src="item.image_url||'https://placehold.co/50x50/111/22c55e?text=M'"
-                class="w-12 h-12 rounded-xl object-cover flex-shrink-0"/>
+              <img :src="optimizeCloudinaryUrl(item.image_url, 100)||\'https://placehold.co/50x50/111/22c55e?text=M\'"
+                class="w-12 h-12 rounded-xl object-cover flex-shrink-0" loading="lazy"/>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-bold truncate" x-text="item.name"></p>
                 <p class="text-xs text-gray-400"
@@ -489,6 +489,60 @@ function checkoutPage() {
     }
   };
 }
+
+function optimizeCloudinaryUrl(url, width = 100) {
+  if (!url) return '';
+  if (url.includes('res.cloudinary.com')) {
+    const parts = url.split('/upload/');
+    if (parts.length === 2) {
+      return `${parts[0]}/upload/w_${width},c_limit,q_auto,f_auto/${parts[1]}`;
+    }
+  }
+  return url;
+}
 </script>
+
+<!-- FLOATING CONTACT BUTTONS -->
+<style>
+.floating-contact {
+  position: fixed;
+  bottom: 24px;
+  right: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.floating-contact a {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  border: 2px solid #fff;
+  font-size: 1.3rem;
+}
+.floating-contact a:hover {
+  transform: scale(1.08);
+}
+.floating-phone { background: #000; }
+.floating-wa { background: #25d366; box-shadow: 0 4px 20px rgba(37,211,102,0.45); }
+@media(min-width:768px){ .floating-contact { bottom: 28px; right: 28px; } }
+</style>
+
+<div class="floating-contact">
+  <a href="tel:01039450300" class="floating-phone" aria-label="اتصل بنا">
+    <i class="fas fa-phone-alt"></i>
+  </a>
+  <a href="https://wa.me/201039450300" target="_blank" rel="noopener noreferrer" class="floating-wa" aria-label="تواصل معنا عبر واتساب">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
+
 </body>
 </html>

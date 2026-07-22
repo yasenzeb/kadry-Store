@@ -44,8 +44,8 @@
     <div class="lg:col-span-2 space-y-4">
       <template x-for="(item,idx) in cart" :key="idx">
         <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100">
-          <img :src="item.image_url || 'https://placehold.co/100x100/111/ffffff?text=K'"
-               :alt="item.name" class="w-24 h-24 object-cover rounded-xl flex-shrink-0"/>
+          <img :src="optimizeCloudinaryUrl(item.image_url, 150) || 'https://placehold.co/100x100/111/ffffff?text=K'"
+               :alt="item.name" class="w-24 h-24 object-cover rounded-xl flex-shrink-0" loading="lazy"/>
           <div class="flex-1 min-w-0">
             <h3 class="font-black text-base leading-snug mb-1 truncate" x-text="item.name"></h3>
             <div class="flex gap-3 text-xs text-gray-500 mb-2 flex-wrap">
@@ -60,54 +60,98 @@
                 <span class="w-8 text-center font-bold" x-text="item.qty||1"></span>
                 <button @click="changeQty(idx,1)" class="w-8 h-8 bg-gray-100 rounded-lg font-black hover:bg-gray-200 transition">+</button>
               </div>
-              <span class="font-black text-black" x-text="'EGP '+((item.finalPrice||item.price)*(item.qty||1))"></span>
             </div>
           </div>
-          <button @click="removeItem(idx)" class="text-gray-300 hover:text-red-500 transition ml-2 flex-shrink-0">
-            <i class="fas fa-trash text-lg"></i>
+          <button @click="removeItem(idx)" class="text-gray-300 hover:text-red-500 transition p-2 text-xl">
+            <i class="fas fa-trash"></i>
           </button>
         </div>
       </template>
     </div>
 
-    <!-- Summary -->
-    <div class="lg:col-span-1">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
-        <h2 class="text-xl font-black mb-6 border-b pb-4">ملخص الطلب</h2>
-
-        <div class="space-y-3 text-sm mb-6">
-          <div class="flex justify-between">
-            <span class="text-gray-500">المجموع الفرعي</span>
-            <span class="font-bold" x-text="'EGP '+subtotal"></span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500">الشحن</span>
-            <span class="font-bold text-gray-600">حسب المحافظه</span>
-          </div>
-          <div class="border-t pt-3 flex justify-between text-xl font-black">
-            <span>الإجمالي</span>
-            <span class="text-black" x-text="'EGP '+subtotal"></span>
-          </div>
+    <!-- Order Summary -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 h-fit">
+      <h2 class="font-black text-xl mb-6">ملخص الطلب</h2>
+      <div class="space-y-4 mb-6">
+        <div class="flex justify-between text-gray-600">
+          <span>المجموع الفرعي</span>
+          <span class="font-bold text-black" x-text="'EGP '+subtotal"></span>
         </div>
-
-        <a href="checkout.html" class="block w-full bg-black text-white font-black py-4 rounded-2xl text-center hover:bg-gray-800 transition text-lg mb-3">
-          <i class="fas fa-credit-card ml-2"></i>إتمام الطلب
-        </a>
-        <a href="index.html" class="block w-full bg-gray-100 text-black font-bold py-3 rounded-2xl text-center hover:bg-gray-200 transition text-sm">
-          متابعة التسوق
-        </a>
-
-        <div class="flex justify-center gap-4 mt-4 text-xs text-gray-400">
-          <span><i class="fas fa-lock ml-1 text-black"></i>دفع آمن</span>
-          <span><i class="fas fa-truck ml-1 text-black"></i>شحن سريع</span>
+        <div class="flex justify-between text-gray-600">
+          <span>الشحن</span>
+          <span class="font-bold text-green-600">يُحسب عند إتمام الطلب</span>
+        </div>
+        <div class="border-t pt-4 flex justify-between items-center">
+          <span class="font-black text-lg">الإجمالي</span>
+          <span class="font-black text-2xl text-black" x-text="'EGP '+subtotal"></span>
         </div>
       </div>
+      <a href="checkout.html"
+        class="w-full bg-black text-white font-black py-4 rounded-2xl hover:bg-gray-800 transition text-center block text-lg">
+        متابعة إتمام الطلب <i class="fas fa-arrow-left mr-2"></i>
+      </a>
+      <a href="index.html" class="block text-center text-sm text-gray-400 font-bold mt-4 hover:text-black">
+        متابعة التسوق
+      </a>
     </div>
   </div>
   </template>
 </div>
 
+<!-- FLOATING CONTACT BUTTONS -->
+<style>
+.floating-contact {
+  position: fixed;
+  bottom: 24px;
+  right: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.floating-contact a {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  border: 2px solid #fff;
+  font-size: 1.3rem;
+}
+.floating-contact a:hover {
+  transform: scale(1.08);
+}
+.floating-phone { background: #000; }
+.floating-wa { background: #25d366; box-shadow: 0 4px 20px rgba(37,211,102,0.45); }
+@media(min-width:768px){ .floating-contact { bottom: 28px; right: 28px; } }
+</style>
+
+<div class="floating-contact">
+  <a href="tel:01039450300" class="floating-phone" aria-label="اتصل بنا">
+    <i class="fas fa-phone-alt"></i>
+  </a>
+  <a href="https://wa.me/201039450300" target="_blank" rel="noopener noreferrer" class="floating-wa" aria-label="تواصل معنا عبر واتساب">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
+
 <script>
+function optimizeCloudinaryUrl(url, width = 200) {
+  if (!url) return '';
+  if (url.includes('res.cloudinary.com')) {
+    const parts = url.split('/upload/');
+    if (parts.length === 2) {
+      return `${parts[0]}/upload/w_${width},c_limit,q_auto,f_auto/${parts[1]}`;
+    }
+  }
+  return url;
+}
+
 function cartPage() {
   return {
     cart: [],

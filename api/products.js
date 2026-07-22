@@ -25,10 +25,14 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const { type } = req.query;
+      const { type, full } = req.query;
+      let selectFields = '*';
+      if (full !== 'true') {
+        selectFields = 'id, name, type, price, image_url, discount_type, discount_value, created_at';
+      }
       let query = supabase
         .from('products')
-        .select('*')
+        .select(selectFields)
         .order('created_at', { ascending: false });
 
       if (type && type !== 'all') {

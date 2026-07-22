@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="referrer" content="strict-origin-when-cross-origin"/>
 
-<title>كادري ستور - Kadry Store | أفضل متجر أحذية وكوتشيات رجالي في مصر</title>
-<meta name="description" content="كادري ستور: مكان كل الناس لأحدث صيحات الأحذية وكوتشيات رجالي، سليبرز، وأحذية رياضية. تشكيلة مميزة ومبتكرة بأعلى جودة وأفضل سعر في مصر مع شحن سريع لجميع المحافظات. اطلب الآن!"/>
+<title>كادري ستور - فرع ديرب نجم فقط | Kadry Store Deirb Negm | أفضل متجر أحذية وكوتشيات رجالي في مصر</title>
+<meta name="description" content="كادري ستور - فرع ديرب نجم فقط (Kadry Store Deirb Negm): مكان كل الناس لأحدث صيحات الأحذية، الكوتشيات الرجالي، السليبرز، والأحذية الرياضية. أفضل خامات وأحدث موديلات بأحسن سعر مع شحن لكل مصر."/>
 <meta name="keywords" content="
 كوتشيات رجالي شبابي تريندات واوريجينال ديرب نجم 
 عروضات وخوصومات كادري ديرب نجم احذية 
@@ -363,7 +363,7 @@ body{background:var(--navy);color:var(--text);position:relative;}
 .section-line{width:40px;height:3px;background:linear-gradient(90deg,#000 0%,#555 100%);border-radius:2px;margin:12px 0 0;}
 
 /* PRODUCT CARDS */
-.prod-card{background:linear-gradient(135deg,#fff 0%,#f8f8f8 100%);border:1px solid var(--border);border-radius:0;overflow:hidden;transition:all 0.3s;cursor:pointer;position:relative;}
+.prod-card{background:linear-gradient(135deg,#fff 0%,#f8f8f8 100%);border:1px solid var(--border);border-radius:0;overflow:hidden;transition:all 0.3s;cursor:pointer;position:relative;backface-visibility:hidden;transform:translate3d(0,0,0);content-visibility:auto;contain-intrinsic-size:1px 320px;}
 .prod-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,0.12);}
 .prod-img-wrap{height:220px;background:linear-gradient(135deg,#f8f8f8 0%,#e8e8e8 50%,#f0f0f0 100%);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
 .prod-img-wrap img{height:100%;width:100%;object-fit:cover;transition:transform 0.5s;}
@@ -416,10 +416,46 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
 /* TOAST */
 .toast-popup{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#000 0%,#2a2a2a 100%);color:#fff;font-weight:900;padding:12px 28px;border-radius:2px;z-index:9999;font-size:0.9rem;pointer-events:none;box-shadow:4px 4px 0 rgba(0,0,0,0.3);}
 
-/* WHATSAPP */
-.wa-btn{position:fixed;bottom:90px;right:16px;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;z-index:999;box-shadow:0 4px 20px rgba(37,211,102,0.45);transition:all 0.15s;border:none;text-decoration:none;}
-.wa-btn:hover{transform:scale(1.05);}
-@media(min-width:768px){.wa-btn{bottom:30px;right:30px;}}
+/* FLOATING CONTACT WIDGET */
+.floating-contact {
+  position: fixed;
+  bottom: 84px;
+  right: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.floating-contact a {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  border: 2px solid #fff;
+  font-size: 1.3rem;
+}
+.floating-contact a:hover {
+  transform: scale(1.08);
+}
+.floating-phone {
+  background: #000;
+}
+.floating-wa {
+  background: #25d366;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+}
+@media(min-width:768px){
+  .floating-contact {
+    bottom: 28px;
+    right: 28px;
+  }
+}
 
 @media(max-width:640px){
   .prod-grid{grid-template-columns:repeat(2,1fr)!important;gap:8px!important;}
@@ -627,7 +663,7 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
       <template x-for="p in filteredProducts" :key="p.id">
         <div class="prod-card" @click="goToProduct(p)" style="border-radius:2px;">
           <div class="prod-img-wrap">
-            <img :src="p.image_url||'https://placehold.co/400x300/f5f5f5/000000?text=KADRY'" :alt="p.name + ' - كوتشيات كادري ستور الفاخرة'" loading="lazy"/>
+            <img :src="optimizeCloudinaryUrl(p.image_url, 400)||'https://placehold.co/400x300/f5f5f5/000000?text=KADRY'" :alt="p.name + ' - كوتشيات كادري ستور الفاخرة فرع ديرب نجم'" loading="lazy"/>
             <div class="badge-new" x-show="isNew(p)">NEW</div>
             <div class="badge-sale" x-show="hasDiscount(p)" x-text="discountBadge(p)"></div>
           </div>
@@ -644,6 +680,14 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
         <i class="fas fa-box-open" style="font-size:3rem;margin-bottom:12px;display:block;"></i>
         <p style="font-weight:700;">لا توجد منتجات</p>
       </div>
+    </div>
+    <!-- Infinite Scroll Sentinel -->
+    <div id="scroll-sentinel" class="py-6 flex items-center justify-center">
+      <template x-if="displayLimit < filteredProductsAll.length">
+        <div class="text-gray-500 font-bold text-sm flex items-center gap-2">
+          <i class="fas fa-spinner fa-spin"></i> جاري تحميل باقي المنتجات...
+        </div>
+      </template>
     </div>
   </div>
 </section>
@@ -788,7 +832,7 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
       </template>
       <template x-for="item in cart" :key="item._key">
         <div class="flex gap-4 mb-6 pb-6 border-b border-gray-100">
-          <img :src="item.image_url" class="w-20 h-20 object-cover bg-gray-50"/>
+          <img :src="optimizeCloudinaryUrl(item.image_url, 150)" class="w-20 h-20 object-cover bg-gray-50 rounded" loading="lazy"/>
           <div class="flex-1">
             <h4 class="font-bold text-sm" x-text="item.name"></h4>
             <p class="text-xs text-muted mt-1" x-text="'مقاس: ' + item.size"></p>
@@ -810,9 +854,21 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
   </div>
 </div>
 
+<<<<<<< HEAD
 <!-- SIZE PICKER MODAL -->
 <!-- WHATSAPP -->
 <a href="https://wa.me/201039450300" target="_blank" aria-label="تواصل معنا عبر واتساب" class="wa-btn"><i class="fab fa-whatsapp"></i></a>
+=======
+<!-- FLOATING CONTACT BUTTONS (WhatsApp & Phone) -->
+<div class="floating-contact">
+  <a href="tel:01039450300" class="floating-phone" aria-label="اتصل بنا">
+    <i class="fas fa-phone-alt"></i>
+  </a>
+  <a href="https://wa.me/201039450300" target="_blank" rel="noopener noreferrer" class="floating-wa" aria-label="تواصل معنا عبر واتساب">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
+>>>>>>> 1fdccb9 (fix(store): fix scroll performance, dynamic product slugs, floating contact buttons, and Deirb Negm SEO product schema)
 
 <!-- TOAST -->
 <div x-show="toast" x-transition x-cloak class="toast-popup"><i class="fas fa-check-circle"></i> تمت الإضافة للسلة!</div>
@@ -820,26 +876,118 @@ footer{background:#ffffff;color:#000000;border-top:1px solid var(--border);}
 <style>.prod-card:hover .hover-reveal{opacity:1!important;}</style>
 
 <script>
-// ============================================================
-// الإصلاح: تم تغيير API من URL وهمي إلى نص فارغ
-// حتى تعمل الـ fetch calls كـ relative URLs على نفس الدومين
-// ============================================================
 const API = '';
+
+function optimizeCloudinaryUrl(url, width = 400) {
+  if (!url) return '';
+  if (url.includes('res.cloudinary.com')) {
+    const parts = url.split('/upload/');
+    if (parts.length === 2) {
+      return `${parts[0]}/upload/w_${width},c_limit,q_auto,f_auto/${parts[1]}`;
+    }
+  }
+  return url;
+}
 
 function store(){
   return{
     products:[],categories:[],reviews:[],activeFilter:'',searchQuery:'',loadingProds:true,loadingCats:true,
     mobileMenu:false,cartCount:0,toast:false,cartOpen:false,cart:[],
+    displayLimit:15,
 
     get cartTotal(){ return this.cart.reduce((sum, i) => sum + (this.calcPrice(i) * (i.qty || 1)), 0); },
     async init(){
       this.cart = this.getCart();
       this.cartCount = this.cart.length;
       await Promise.all([this.fetchProducts(),this.fetchCategories(),this.fetchReviews()]);
+      this.setupInfiniteScroll();
+      this.$watch('searchQuery', () => {
+        this.displayLimit = 15;
+      });
+    },
+    setupInfiniteScroll() {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          this.displayLimit = Math.min(this.displayLimit + 15, this.products.length);
+        }
+      }, { rootMargin: '200px' });
+      
+      setTimeout(() => {
+        const sentinel = document.getElementById('scroll-sentinel');
+        if (sentinel) observer.observe(sentinel);
+      }, 500);
     },
     async fetchProducts(){
-      try{const r=await fetch(`${API}/api/products`);const d=await r.json();this.products=d.products||[];}catch{this.products=[];}
+      try{
+        const r=await fetch(`${API}/api/products`);
+        const d=await r.json();
+        this.products=d.products||[];
+        this.injectProductSchema(this.products);
+      }catch{
+        this.products=[];
+      }
       this.loadingProds=false;
+    },
+    injectProductSchema(products) {
+      try {
+        const oldSchema = document.getElementById('dynamic-product-schema');
+        if (oldSchema) oldSchema.remove();
+
+        if (!products || !products.length) return;
+
+        const itemListElement = products.slice(0, 30).map((p, idx) => {
+          const finalPrice = this.calcPrice(p);
+          const productUrl = `https://kadry1.com/product.html?id=${encodeURIComponent(p.name ? p.name.trim().replace(/\s+/g, '-') : p.id)}`;
+          return {
+            "@type": "ListItem",
+            "position": idx + 1,
+            "url": productUrl,
+            "name": p.name,
+            "image": p.image_url || "https://kadry1.com/logo.jpeg"
+          };
+        });
+
+        const listSchema = {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "منتجات كادري ستور ديرب نجم",
+          "numberOfItems": products.length,
+          "itemListElement": itemListElement
+        };
+
+        const productSchemas = products.slice(0, 10).map(p => {
+          const finalPrice = this.calcPrice(p);
+          const productUrl = `https://kadry1.com/product.html?id=${encodeURIComponent(p.name ? p.name.trim().replace(/\s+/g, '-') : p.id)}`;
+          return {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": p.name,
+            "image": p.image_url ? [p.image_url] : ["https://kadry1.com/logo.jpeg"],
+            "description": `${p.name} - كوتشيات رجالي عصرية متوفرة في كادري ستور فرع ديرب نجم. خامات فاخرة وتوصيل لجميع المحافظات.`,
+            "sku": p.id,
+            "offers": {
+              "@type": "Offer",
+              "url": productUrl,
+              "priceCurrency": "EGP",
+              "price": finalPrice,
+              "itemCondition": "https://schema.org/NewCondition",
+              "availability": "https://schema.org/InStock",
+              "seller": {
+                "@type": "Store",
+                "name": "كادري ستور ديرب نجم - Kadry Store"
+              }
+            }
+          };
+        });
+
+        const script = document.createElement('script');
+        script.id = 'dynamic-product-schema';
+        script.type = 'application/ld+json';
+        script.text = JSON.stringify([listSchema, ...productSchemas]);
+        document.head.appendChild(script);
+      } catch (err) {
+        console.error('Error injecting product schema:', err);
+      }
     },
     async fetchCategories(){
       try{const r=await fetch(`${API}/api/categories`);const d=await r.json();this.categories=d.categories||[];}catch{this.categories=[];}
@@ -858,7 +1006,7 @@ function store(){
         ];
       }
     },
-    get filteredProducts(){
+    get filteredProductsAll(){
       let prods = this.products;
       if(this.activeFilter) prods = prods.filter(p=>p.type===this.activeFilter);
       if(this.searchQuery){
@@ -866,6 +1014,9 @@ function store(){
         prods = prods.filter(p=>p.name.toLowerCase().includes(q));
       }
       return prods;
+    },
+    get filteredProducts(){
+      return this.filteredProductsAll.slice(0, this.displayLimit);
     },
     calcPrice(p){
       if(!p.discount_type||p.discount_type==='none'||!p.discount_value) return p.price;
@@ -880,14 +1031,19 @@ function store(){
       return `-${p.discount_value} ج.م`;
     },
     isNew(p){if(!p.created_at) return false; return (Date.now()-new Date(p.created_at))<7*24*60*60*1000;},
-    filterByCategory(slug){this.activeFilter=slug;document.getElementById('products').scrollIntoView({behavior:'smooth'});},
-    goToProduct(p){localStorage.setItem('kadry_product',JSON.stringify(p));window.location.href='product.html';},
+    filterByCategory(slug){
+      this.activeFilter=slug;
+      this.displayLimit=15;
+      document.getElementById('products').scrollIntoView({behavior:'smooth'});
+    },
+    goToProduct(p){
+      localStorage.setItem('kadry_product',JSON.stringify(p));
+      const slug = p.name ? p.name.trim().replace(/\s+/g, '-') : p.id;
+      window.location.href = `product.html?id=${encodeURIComponent(slug)}`;
+    },
     getCart(){try{return JSON.parse(localStorage.getItem('kadry_cart')||'[]');}catch{return[];}},
 
     removeFromCart(key){ this.cart = this.cart.filter(i => i._key !== key); this.saveCart(); },
-    // ⚠️ ملاحظة أمنية: يتم  finalPrice في localStorage لعرضه فقط في السلة.
-    // لا يجب الاعتماد على أي سعر/خصم/إجمالي  من localStorage أو المتصفح كمصدر موثوق للدفع الفعلي،
-    // لأن المستخدم يمكنه تعديل قيم المتصفح بسهولة. أي عملية دفع حقيقية يجب أن تُحسب وتُتحقق من جهة السيرفر.
     saveCart(){ localStorage.setItem('kadry_cart', JSON.stringify(this.cart)); this.cartCount = this.cart.length; }
   }
 }

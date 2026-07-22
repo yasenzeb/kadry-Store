@@ -67,8 +67,8 @@
     <div>
       <!-- Main Image -->
       <div class="relative rounded-3xl overflow-hidden bg-gray-50 border border-gray-100 mb-3 main-img-wrap" style="min-height:350px">
-        <img :src="activeImage || 'https://placehold.co/600x500/111/000000?text=K'"
-             :alt="product.name" class="w-full object-cover" style="min-height:350px;max-height:480px;object-fit:contain"/>
+        <img :src="optimizeCloudinaryUrl(activeImage, 800) || 'https://placehold.co/600x500/111/000000?text=K'"
+             :alt="product.name" class="w-full object-cover" style="min-height:350px;max-height:480px;object-fit:contain" loading="lazy"/>
         <template x-if="product.discount_type && product.discount_value">
           <span class="absolute top-4 right-4 bg-black text-white font-black px-4 py-2 rounded-full text-lg"
             x-text="product.discount_type==='percent' ? '-'+product.discount_value+'%' : 'خصم'"></span>
@@ -79,8 +79,8 @@
         <template x-for="(img, idx) in allImages" :key="idx">
           <div @click="activeImage=img"
                :class="activeImage===img ? 'thumb-active border-2' : 'border border-gray-200'"
-               class="thumb-img w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
-            <img :src="img" :alt="'صورة '+(idx+1)" class="w-full h-full object-cover"/>
+               class="thumb-img w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 cursor-pointer">
+            <img :src="optimizeCloudinaryUrl(img, 150)" :alt="'صورة '+(idx+1)" class="w-full h-full object-cover" loading="lazy"/>
           </div>
         </template>
       </div>
@@ -180,12 +180,57 @@
   </template>
 </section>
 
-<!-- WHATSAPP FLOATING BUTTON -->
-<a href="https://wa.me/77014738052" target="_blank" rel="noopener noreferrer" aria-label="تواصل معنا عبر واتساب"
-   style="position:fixed;bottom:90px;right:16px;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;z-index:999;box-shadow:0 4px 20px rgba(37,211,102,0.45);transition:all 0.15s;text-decoration:none;"
-   onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-  <i class="fab fa-whatsapp"></i>
-</a>
+<!-- FLOATING CONTACT BUTTONS (WhatsApp & Phone) -->
+<style>
+.floating-contact {
+  position: fixed;
+  bottom: 24px;
+  right: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.floating-contact a {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  border: 2px solid #fff;
+  font-size: 1.3rem;
+}
+.floating-contact a:hover {
+  transform: scale(1.08);
+}
+.floating-phone {
+  background: #000;
+}
+.floating-wa {
+  background: #25d366;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+}
+@media(min-width:768px){
+  .floating-contact {
+    bottom: 28px;
+    right: 28px;
+  }
+}
+</style>
+
+<div class="floating-contact">
+  <a href="tel:01039450300" class="floating-phone" aria-label="اتصل بنا">
+    <i class="fas fa-phone-alt"></i>
+  </a>
+  <a href="https://wa.me/201039450300" target="_blank" rel="noopener noreferrer" class="floating-wa" aria-label="تواصل معنا عبر واتساب">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
 
 <!-- TOAST -->
 <div x-show="toast" x-transition class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black text-white font-black px-6 py-3 rounded-full shadow-xl z-50 text-sm">
@@ -193,6 +238,17 @@
 </div>
 
 <script>
+function optimizeCloudinaryUrl(url, width = 800) {
+  if (!url) return '';
+  if (url.includes('res.cloudinary.com')) {
+    const parts = url.split('/upload/');
+    if (parts.length === 2) {
+      return `${parts[0]}/upload/w_${width},c_limit,q_auto,f_auto/${parts[1]}`;
+    }
+  }
+  return url;
+}
+
 function productPage() {
   return {
     product: {},
@@ -211,33 +267,35 @@ function productPage() {
     async init() {
       this.cartCount = this.getCart().length;
 
-      // Read id from URL query string
+      // Read id or slug from URL query string
       const urlId = new URLSearchParams(window.location.search).get('id');
 
       // Fast-path: show cached data immediately while fetch is in-flight
       if (urlId) {
         try {
           const cached = JSON.parse(localStorage.getItem('kadry_product') || '{}');
-          if (cached && cached.id === urlId) {
+          const cachedSlug = cached.name ? cached.name.trim().replace(/\s+/g, '-') : cached.id;
+          const decodedQuery = decodeURIComponent(urlId);
+          if (cached && (cached.id === urlId || cachedSlug === decodedQuery || cached.name === decodedQuery)) {
             this._applyProduct(cached);
           }
         } catch {}
       } else {
-        // No id in URL — fall back to localStorage only (legacy deep link)
+        // Fall back to localStorage if no URL parameter
         try {
           const cached = JSON.parse(localStorage.getItem('kadry_product') || '{}');
           if (cached && cached.id) {
             this._applyProduct(cached);
           }
         } catch {}
-        return; // nothing to fetch without an id
+        return;
       }
 
       // Fetch authoritative data from API
       try {
         const resp = await fetch(`/api/products/${encodeURIComponent(urlId)}`);
         if (resp.status === 404) {
-          this.product = {}; // trigger "not found" state
+          this.product = {};
           return;
         }
         const data = await resp.json();
@@ -248,7 +306,6 @@ function productPage() {
         }
       } catch (err) {
         console.error('[product.html] fetch failed:', err);
-        // Keep cached data if fetch fails — do not clear product
       }
     },
 
@@ -271,10 +328,10 @@ function productPage() {
       this.allImages  = imgs;
       this.activeImage = imgs[0] || 'https://placehold.co/600x500/111/000000?text=K';
 
-      // Dynamic SEO
+      // Dynamic SEO & Structured Data
       if (p.name) {
-        const title = `${p.name} | KADRY Store`;
-        const desc  = `اشتري ${p.name} من KADRY Store. شحن سريع لجميع محافظات مصر.`;
+        const title = `${p.name} | كادري ستور - فرع ديرب نجم فقط`;
+        const desc  = `اشتري ${p.name} من كادري ستور (فرع ديرب نجم فقط). خامات أصلية وفاخرة وأفضل سعر في مصر مع شحن لجميع المحافظات.`;
         const img   = p.image_url || 'https://kadry1.com/logo.jpeg';
         document.title = title;
         document.querySelector('meta[name="description"]')?.setAttribute('content', desc);
@@ -284,6 +341,40 @@ function productPage() {
         document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', title);
         document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', desc);
         document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', img);
+
+        // Inject Product JSON-LD Schema
+        try {
+          const oldSchema = document.getElementById('product-jsonld');
+          if (oldSchema) oldSchema.remove();
+
+          const finalPrice = this.calcPrice();
+          const schema = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": p.name,
+            "image": this.allImages.length ? this.allImages : [img],
+            "description": desc,
+            "sku": p.id,
+            "offers": {
+              "@type": "Offer",
+              "url": window.location.href,
+              "priceCurrency": "EGP",
+              "price": finalPrice,
+              "itemCondition": "https://schema.org/NewCondition",
+              "availability": "https://schema.org/InStock",
+              "seller": {
+                "@type": "Store",
+                "name": "كادري ستور - فرع ديرب نجم فقط"
+              }
+            }
+          };
+
+          const script = document.createElement('script');
+          script.id = 'product-jsonld';
+          script.type = 'application/ld+json';
+          script.text = JSON.stringify(schema);
+          document.head.appendChild(script);
+        } catch (e) {}
       }
     },
 
@@ -304,7 +395,6 @@ function productPage() {
     },
 
     addToCart() {
-      // التحقق من اختيار المقاس واللون
       this.sizeError = !this.selectedSize;
       this.colorError = (this.colors.length > 0) ? !this.selectedColor : false;
 

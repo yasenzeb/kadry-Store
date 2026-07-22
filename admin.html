@@ -919,7 +919,7 @@ async function confirmDeleteRev(){
 /* ══ PRODUCTS ══ */
 async function loadAllProducts(){
   try{
-    const data=await api('GET','/api/products');
+    const data=await api('GET','/api/products?full=true');
     if(!data.success)throw new Error(data.error);
     allProducts=data.products||[];
     updateStats();applyFilterAndSearch();renderRecentTable();renderCategoriesTable();

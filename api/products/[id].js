@@ -29,13 +29,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, error: 'Product ID is required.' });
   }
 
+  const decodedId = decodeURIComponent(id);
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(decodedId);
+
   try {
     if (req.method === 'GET') {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
+      let queryBuilder = supabase.from('products').select('*');
+      if (isUUID) {
+        queryBuilder = queryBuilder.eq('id', decodedId);
+      } else {
+        const nameWithSpaces = decodedId.replace(/-/g, ' ').trim();
+        queryBuilder = queryBuilder.eq('name', nameWithSpaces);
+      }
+
+      const { data, error } = await queryBuilder.single();
 
       if (error) throw error;
       if (!data) return res.status(404).json({ success: false, error: 'Product not found.' });
@@ -102,12 +109,15 @@ export default async function handler(req, res) {
       // Ensure discount_value is zero when discount_type is 'none'
       if (updates.discount_type === 'none') updates.discount_value = 0;
 
-      const { data, error } = await supabase
-        .from('products')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
+      let queryBuilder = supabase.from('products').update(updates);
+      if (isUUID) {
+        queryBuilder = queryBuilder.eq('id', decodedId);
+      } else {
+        const nameWithSpaces = decodedId.replace(/-/g, ' ').trim();
+        queryBuilder = queryBuilder.eq('name', nameWithSpaces);
+      }
+
+      const { data, error } = await queryBuilder.select().single();
 
       if (error) throw error;
       return res.status(200).json({ success: true, product: data });
@@ -118,10 +128,15 @@ export default async function handler(req, res) {
         return res.status(403).json({ success: false, error: 'غير مصرح.' });
       }
 
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id);
+      let queryBuilder = supabase.from('products').delete();
+      if (isUUID) {
+        queryBuilder = queryBuilder.eq('id', decodedId);
+      } else {
+        const nameWithSpaces = decodedId.replace(/-/g, ' ').trim();
+        queryBuilder = queryBuilder.eq('name', nameWithSpaces);
+      }
+
+      const { error } = await queryBuilder;
 
       if (error) throw error;
       return res.status(200).json({ success: true, message: 'Product deleted.' });
